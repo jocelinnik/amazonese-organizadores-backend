@@ -1,0 +1,3 @@
+interface BaseDTO {}
+
+export { BaseDTO };

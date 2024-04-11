@@ -1,0 +1,40 @@
+{
+  "name": "amazonese-organizadores-backend",
+  "version": "1.0.0",
+  "description": "Backend da aplicação de acesso dos organizadores para gerenciar eventos postados no aplicativo",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p . && tsc-alias",
+    "dev": "ts-node-dev -r tsconfig-paths/register --inspect --ignore-watch node_modules src/servidor.ts",
+    "start": "node dist/servidor.js",
+    "test": "echo \"No tests yet...\""
+  },
+  "keywords": [
+    "amazonese",
+    "organizadores",
+    "eventos",
+    "backend"
+  ],
+  "author": "Linnik Maciel <linnik.souza123@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/module-alias": "^2.0.4",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.11.30",
+    "prisma": "^5.11.0",
+    "ts-alias": "^0.0.7",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "@azure/storage-blob": "^12.17.0",
+    "@prisma/client": "^5.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}

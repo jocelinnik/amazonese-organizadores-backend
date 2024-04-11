@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Organizador {
+  cpfCnpj       String @id @map("cpf_cnpj")
+  nome          String @map("nome")
+  email         String @map("email")
+  telefone      String @map("telefone")
+  senha         String @map("senha")
+  fraseSecreta  String @map("frase_secreta")
+  eventos       Evento[]
+
+  @@map("organizadores")
+}
+
+model Evento {
+  id                  String @id @map("id")
+  nome                String @map("nome")
+  descricao           String @map("descricao")
+  preco               Decimal @map("preco")
+  cidadeEvento        String @map("cidade_evento")
+  ufEvento            String @map("uf_evento")
+  dataInicio          DateTime @db.Date @map("data_inicio")
+  dataFim             DateTime @db.Date @map("data_fim")
+  cpfCnpjOrganizador  String @map("cpf_cnpj_organizador")
+  categorias          Json
+  organizador         Organizador @relation(fields: [cpfCnpjOrganizador], references: [cpfCnpj])
+  imagens             ImagemEvento[]
+
+  @@map("eventos")
+}
+
+model ImagemEvento {
+  id        String @id @map("id")
+  urlImagem String @map("url_imagem")
+  idEvento  String @map("id_evento")
+  evento    Evento @relation(fields: [idEvento], references: [id])
+
+  @@map("imagens_eventos")
+}
