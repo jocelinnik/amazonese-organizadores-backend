@@ -52,6 +52,7 @@ jobs:
       - name: Instalando dependencias e gerando a aplicacao
         run: |
           npm ci
+          npm i -g tsc-alias
           npm run build
 
       - name: Autenticacao no Azure Container Registry
