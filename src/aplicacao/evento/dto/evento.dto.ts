@@ -20,6 +20,8 @@ interface LocalidadeEventoDTO {
 interface DatasEventoDTO {
     data_inicio: string;
     data_fim: string;
+    hora_inicio: string;
+    hora_encerramento: string;
 }
 
 interface DadosEventoDTO {

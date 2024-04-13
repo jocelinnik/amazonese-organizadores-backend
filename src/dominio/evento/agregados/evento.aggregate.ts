@@ -5,7 +5,7 @@ import { CategoriaVO } from "@/dominio/evento/value-objects/categoria.vo";
 import { DatasEventoVO, InstanciarDatasVOParams } from "@/dominio/evento/value-objects/datas-evento.vo";
 import { DescricaoVO } from "@/dominio/evento/value-objects/descricao.vo";
 import { LocalidadeVO, InstanciarLocalidadeVOParams } from "@/dominio/evento/value-objects/localidade.vo";
-import { NomeVO } from "@/dominio/evento/value-objects/nome.vo";
+import { NomeVO } from "@/dominio/comum/value-objects/nome.vo";
 import { PrecoVO } from "@/dominio/evento/value-objects/preco.vo";
 import { Organizador } from "@/dominio/organizador/modelos/organizador.model";
 import { ImagemEvento } from "./imagem-evento.aggregate";

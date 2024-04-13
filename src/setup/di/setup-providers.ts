@@ -1,7 +1,5 @@
 import { configDotenv } from "dotenv";
 
-import { networkInterfaces } from "node:os";
-
 import { ManipuladorArquivos } from "@/aplicacao/comum/providers/manipulador-arquivos";
 import { CifradorSegredos } from "@/aplicacao/organizador/providers/cifrador-segredos";
 import { GerenciadorTokenAutenticacao } from "@/aplicacao/organizador/providers/gerenciador-tokens-autenticacao";
@@ -13,8 +11,9 @@ import { CryptoUUIDEventoIdFactory } from "@/infraestrutura/evento/node-crypto/c
 import { CryptoImagemEventoIdFactory } from "@/infraestrutura/evento/node-crypto/crypto-imagem-evento-id.factory";
 import { CryptoCifradorSegredos } from "@/infraestrutura/organizador/node-crypto/crypto-cifrador-segredos";
 import { CryptoJWTGerenciadorTokenAutenticacao } from "@/infraestrutura/organizador/node-crypto/crypto-gerenciador-tokens-autenticacao";
-import { ManipuladorArquivosLocal } from "@/infraestrutura/comum/node-fs/manipulador-arquivos-local";
 import { AzureBlobStorageManipuladorArquivos } from "@/infraestrutura/comum/azure-storage/azure-blobstorage-manipulador-arquivos";
+import { ContatoUsuarioId } from "@/dominio/comum/identificadores/contato-usuario.identificador";
+import { CryptoContatoUsuarioIdFactory } from "@/infraestrutura/comum/node-crypto/crypto-contato-usuario-id.factory";
 
 const configurarObjetosProviders = (): void => {
     configDotenv();
@@ -22,6 +21,9 @@ const configurarObjetosProviders = (): void => {
 
     // Configurando instâncias de objetos de serviço
     // da aplicação...
+    container.set("ContatoUsuarioIdFactory", (): IdentificadorFactory<ContatoUsuarioId> => {
+        return new CryptoContatoUsuarioIdFactory();
+    });
     container.set("CifradorSenhas", (): CifradorSegredos => {
         return new CryptoCifradorSegredos({
             algoritmo: process.env.CIFRADOR_SENHAS_ALGORITMO as string,
@@ -49,16 +51,6 @@ const configurarObjetosProviders = (): void => {
             nomeContainer: process.env.AZURE_CONTAINER_IMAGENS_EVENTOS as string,
             containerBaseURL: process.env.AZURE_BLOB_STORAGE_BASEURL as string
         });
-        // const listaIps = networkInterfaces();
-        // const ipLocal = listaIps["Wi-Fi"].find(ip => ip.family === "IPv4");
-
-        // const caminhoImagensEventos = `${process.cwd()}/public/eventos`;
-        // const baseURL = `http://${ipLocal.address}:${Number(process.env.HTTP_PORTA as string)}/eventos`;
-
-        // return new ManipuladorArquivosLocal({
-        //     caminho: caminhoImagensEventos,
-        //     arquivoBaseURL: baseURL
-        // });
     });
     container.set("EventoIdFactory", (): IdentificadorFactory<EventoId> => {
         return new CryptoUUIDEventoIdFactory();

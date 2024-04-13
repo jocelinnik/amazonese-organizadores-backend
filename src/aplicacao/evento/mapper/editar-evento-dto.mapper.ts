@@ -18,7 +18,7 @@ class EditarEventoMapper extends ObjectMapper<EditarEventoDTO, Evento> {
         this._categoriaEventoMapper = params.categoriaEventoMapper;
     }
 
-    public mapearOrigemParaDestino(dto: EditarEventoDTO): Evento {
+    public mapear(dto: EditarEventoDTO): Evento {
         const evento = Evento.instanciar({
             id: EventoId.instanciar(dto.id),
             nome: dto.nome,
@@ -30,11 +30,13 @@ class EditarEventoMapper extends ObjectMapper<EditarEventoDTO, Evento> {
             },
             datasEvento: {
                 dataInicio: dto.datas_evento.data_inicio,
-                dataFim: dto.datas_evento.data_fim
+                dataFim: dto.datas_evento.data_fim,
+                horaInicio: dto.datas_evento.hora_inicio,
+                horaEncerramento: dto.datas_evento.hora_encerramento
             }
         });
 
-        const categorias = this._categoriaEventoMapper.mapearListaOrigemParaListaDestino(dto.categorias);
+        const categorias = this._categoriaEventoMapper.mapearLista(dto.categorias);
         for(let categoria of categorias)
             evento.adicionarCategoria(categoria);
 

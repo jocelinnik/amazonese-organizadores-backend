@@ -1,9 +1,9 @@
 import { BaseVO } from "@/dominio/abstracoes/value-objects/base.vo";
 import { ValidacaoRejeitadaException } from "@/dominio/comum/excecoes/validadores/validador.exception";
+import { TextoRegistroVOInvalidoException } from "@/dominio/comum/excecoes/value-objects/texto-registro.exception";
 import { ValidadorString } from "@/dominio/comum/validadores/string.validador";
-import { EmailVOInvalidoException } from "@/dominio/organizador/excecoes/value-objects/email.exception";
 
-class EmailVO implements BaseVO {
+class TextoRegistroVO implements BaseVO {
 
     private readonly _valor: string;
 
@@ -18,8 +18,8 @@ class EmailVO implements BaseVO {
     public equals(o: BaseVO): boolean {
         let igual = false;
 
-        if(o instanceof EmailVO){
-            const outro = o as EmailVO;
+        if(o instanceof TextoRegistroVO){
+            const outro = o as TextoRegistroVO;
             igual = (this._valor === outro._valor);
         }
 
@@ -27,23 +27,22 @@ class EmailVO implements BaseVO {
     }
 
     public toString(): string {
-        return `EmailVO(${this._valor})`;
+        return `TextoRegistroVO(${this._valor})`;
     }
 
-    public static instanciar(valor?: string): EmailVO {
+    public static instanciar(valor?: string): TextoRegistroVO {
         try{
             ValidadorString
-                .instanciar(valor, "O endereço de e-mail está em branco.")
-                .preenchida("O endereço de e-mail está em branco.")
-                .email("O endereço de e-mail está com o formato inválido.");
-
-            return new EmailVO(valor);
+                .instanciar(valor, "O texto está em branco.")
+                .preenchida("O texto está em branco.");
+            
+            return new TextoRegistroVO(valor);
         }catch(e: any){
             const erro = e as ValidacaoRejeitadaException;
 
-            throw new EmailVOInvalidoException(erro.message);
+            throw new TextoRegistroVOInvalidoException(erro.message);
         }
     }
 }
 
-export { EmailVO };
+export { TextoRegistroVO };

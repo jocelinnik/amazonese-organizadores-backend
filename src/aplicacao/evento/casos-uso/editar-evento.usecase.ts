@@ -22,7 +22,7 @@ class EditarEvento {
 
     public async executar(input: EditarEventoDTO): Promise<void> {
         try{
-            const evento = this._eventoMapper.mapearOrigemParaDestino(input);
+            const evento = this._eventoMapper.mapear(input);
             await this._eventosRepository.salvar(evento);
         }catch(e: any){
             const erro = e as BaseModelException;

@@ -9,7 +9,7 @@ class HidratarOrganizadorMapper extends ObjectMapper<PrismaOrganizadorEntity, Or
         super();
     }
 
-    public mapearOrigemParaDestino(prismaOrganizador: PrismaOrganizadorEntity): Organizador {
+    public mapear(prismaOrganizador: PrismaOrganizadorEntity): Organizador {
         return Organizador.instanciar({
             cpfOuCnpj: CpfCnpjOrganizador.instanciar(prismaOrganizador.cpfCnpj),
             nome: prismaOrganizador.nome,

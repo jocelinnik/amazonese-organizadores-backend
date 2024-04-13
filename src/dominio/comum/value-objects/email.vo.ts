@@ -1,9 +1,9 @@
 import { BaseVO } from "@/dominio/abstracoes/value-objects/base.vo";
 import { ValidacaoRejeitadaException } from "@/dominio/comum/excecoes/validadores/validador.exception";
 import { ValidadorString } from "@/dominio/comum/validadores/string.validador";
-import { NomeVOInvalidoException } from "@/dominio/evento/excecoes/value-objects/nome.exception";
+import { EmailVOInvalidoException } from "@/dominio/comum/excecoes/value-objects/email.exception";
 
-class NomeVO implements BaseVO {
+class EmailVO implements BaseVO {
 
     private readonly _valor: string;
 
@@ -18,8 +18,8 @@ class NomeVO implements BaseVO {
     public equals(o: BaseVO): boolean {
         let igual = false;
 
-        if(o instanceof NomeVO){
-            const outro = o as NomeVO;
+        if(o instanceof EmailVO){
+            const outro = o as EmailVO;
             igual = (this._valor === outro._valor);
         }
 
@@ -27,23 +27,23 @@ class NomeVO implements BaseVO {
     }
 
     public toString(): string {
-        return `NomeVO(${this._valor})`;
+        return `EmailVO(${this._valor})`;
     }
 
-    public static instanciar(valor?: string): NomeVO {
+    public static instanciar(valor?: string): EmailVO {
         try{
             ValidadorString
-                .instanciar(valor, "O nome está em branco.")
-                .preenchida("O nome está em branco.")
-                .temPeloMenos(3, "O nome deve ter pelo menos 3 caracteres.");
+                .instanciar(valor, "O endereço de e-mail está em branco.")
+                .preenchida("O endereço de e-mail está em branco.")
+                .email("O endereço de e-mail está com o formato inválido.");
 
-            return new NomeVO(valor);
+            return new EmailVO(valor);
         }catch(e: any){
             const erro = e as ValidacaoRejeitadaException;
 
-            throw new NomeVOInvalidoException(erro.message);
+            throw new EmailVOInvalidoException(erro.message);
         }
     }
 }
 
-export { NomeVO };
+export { EmailVO };

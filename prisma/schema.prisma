@@ -34,10 +34,13 @@ model Evento {
   ufEvento            String @map("uf_evento")
   dataInicio          DateTime @db.Date @map("data_inicio")
   dataFim             DateTime @db.Date @map("data_fim")
+  horaInicio          DateTime @db.Time @map("hora_inicio")
+  horaEncerramento    DateTime @db.Time @map("hora_fim")
   cpfCnpjOrganizador  String @map("cpf_cnpj_organizador")
   categorias          Json
   organizador         Organizador @relation(fields: [cpfCnpjOrganizador], references: [cpfCnpj])
   imagens             ImagemEvento[]
+  // comentarios         Comentario[]
 
   @@map("eventos")
 }
@@ -49,4 +52,38 @@ model ImagemEvento {
   evento    Evento @relation(fields: [idEvento], references: [id])
 
   @@map("imagens_eventos")
+}
+
+// model Participante {
+//   cpf         String @id @map("cpf")
+//   nome        String @map("nome")
+//   comentarios Comentario[]
+
+//   @@map("participantes")
+// }
+
+// model Comentario {
+//   id              String @id @map("id")
+//   texto           String @map("texto")
+//   notaAvaliacao   Int @map("nota_avaliacao")
+//   dataComentario  DateTime @map("data_comentario")
+//   cpfParticipante String @map("cpf_participante")
+//   idEvento        String @map("id_evento")
+//   participante    Participante @relation(fields: [cpfParticipante], references: [cpf])
+//   evento          Evento @relation(fields: [idEvento], references: [id])
+
+//   @@map("comentarios_eventos")
+// }
+
+model ContatoUsuario {
+  id          String @id @map("id")
+  nomeUsuario String @map("nome")
+  email       String @map("email")
+  telefone    String @map("telefone")
+  tipoUsuario String @map("tipo_usuario")
+  tipoContato String @map("tipo_contato")
+  texto       String @map("texto")
+  dataContato DateTime @map("data_contato")
+
+  @@map("contatos_usuarios")
 }

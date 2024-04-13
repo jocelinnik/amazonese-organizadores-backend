@@ -9,7 +9,7 @@ class HidratarImagemEventoMapper extends ObjectMapper<PrismaImagemEventoEntity, 
         super();
     }
 
-    public mapearOrigemParaDestino(prismaImagemEvento: PrismaImagemEventoEntity): ImagemEvento {
+    public mapear(prismaImagemEvento: PrismaImagemEventoEntity): ImagemEvento {
         return ImagemEvento.instanciar({
             id: ImagemEventoId.instanciar(prismaImagemEvento.id),
             urlImagem: prismaImagemEvento.urlImagem

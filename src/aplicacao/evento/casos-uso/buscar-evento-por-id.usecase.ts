@@ -24,7 +24,7 @@ class BuscarEventoPorId {
         const idEvento = EventoId.instanciar(input);
         const evento = await this._repository.buscarEventoPorId(idEvento);
 
-        return this._eventoDTOMapper.mapearOrigemParaDestino(evento);
+        return this._eventoDTOMapper.mapear(evento);
     }
 }
 

@@ -17,25 +17,20 @@ class CadastrarNovoEventoController {
     }
 
     public async executar(req: Request, res: Response): Promise<void> {
-        const mensagem: Mensagem = {
-            tipo: "SUCESSO",
-            texto: "Evento criado com sucesso"
-        };
-
         try{
             const dadosNovoEvento = req.body as NovoEventoDTO;
-            console.log({ ...dadosNovoEvento });
-            await this._useCase.executar(dadosNovoEvento);
+            const novoEvento = await this._useCase.executar(dadosNovoEvento);
+
+            res.status(201).json(novoEvento);
         }catch(e: any){
             const erro = e as Error;
+            const mensagem: Mensagem = {
+                tipo: "ERRO",
+                texto: `Falha ao tentar criar um novo evento: ${erro.message}`
+            };
 
-            mensagem.tipo = "ERRO";
-            mensagem.texto = `Falha ao tentar criar um novo evento: ${erro.message}`;
+            res.status(400).json(mensagem);
         }
-
-        const status = (mensagem.tipo === "SUCESSO") ? 201 : 400;
-
-        res.status(status).json(mensagem);
     }
 }
 

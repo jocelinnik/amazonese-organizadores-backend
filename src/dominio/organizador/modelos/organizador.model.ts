@@ -1,11 +1,11 @@
 import { BaseVOException } from "@/dominio/abstracoes/excecoes/vo.exception";
+import { EmailVO } from "@/dominio/comum/value-objects/email.vo";
+import { NomeVO } from "@/dominio/comum/value-objects/nome.vo";
+import { TelefoneVO } from "@/dominio/comum/value-objects/telefone.vo";
 import { OrganizadorException } from "@/dominio/organizador/excecoes/modelos/organizador.exception";
 import { CpfCnpjOrganizador } from "@/dominio/organizador/identificadores/organizador.identificador";
-import { EmailVO } from "@/dominio/organizador/value-objects/email.vo";
 import { FraseSecretaVO } from "@/dominio/organizador/value-objects/frase-secreta.vo";
-import { NomeVO } from "@/dominio/organizador/value-objects/nome.vo";
 import { SenhaVO } from "@/dominio/organizador/value-objects/senha.vo";
-import { TelefoneVO } from "@/dominio/organizador/value-objects/telefone.vo";
 
 type NewOrganizadorParams = {
     cpfOuCnpj: CpfCnpjOrganizador;

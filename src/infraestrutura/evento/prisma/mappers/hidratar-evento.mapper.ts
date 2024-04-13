@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 import { ObjectMapper } from "@/aplicacao/abstracoes/mapper/base.mapper";
 import { Evento } from "@/dominio/evento/agregados/evento.aggregate";
 import { ImagemEvento } from "@/dominio/evento/agregados/imagem-evento.aggregate";
@@ -30,15 +32,17 @@ class HidratarEventoMapper extends ObjectMapper<PrismaEventoEntity, Evento> {
         this._imagemEventoMapper = params.imagemEventoMapper;
     }
 
-    public mapearOrigemParaDestino(prismaEvento: PrismaEventoEntity): Evento {
+    public mapear(prismaEvento: PrismaEventoEntity): Evento {
         const evento = Evento.instanciar({
             id: EventoId.instanciar(prismaEvento.id),
             nome: prismaEvento.nome,
             descricao: prismaEvento.descricao,
             preco: prismaEvento.preco.toNumber(),
             datasEvento: {
-                dataInicio: this.formatarDataPadraoISO(prismaEvento.dataInicio),
-                dataFim: this.formatarDataPadraoISO(prismaEvento.dataFim),
+                dataInicio: this.formatarData(prismaEvento.dataInicio),
+                dataFim: this.formatarData(prismaEvento.dataFim),
+                horaInicio: this.formatarHora(prismaEvento.horaInicio),
+                horaEncerramento: this.formatarHora(prismaEvento.horaEncerramento)
             },
             localidade: {
                 cidade: prismaEvento.cidadeEvento,
@@ -49,7 +53,7 @@ class HidratarEventoMapper extends ObjectMapper<PrismaEventoEntity, Evento> {
         // Se tivermos categorias vindas do banco de dados, adicionamos 
         // no objeto de modelo...
         if(prismaEvento.categorias){
-            const categorias = this._categoriaVOMapper.mapearListaOrigemParaListaDestino(prismaEvento.categorias as string[]);
+            const categorias = this._categoriaVOMapper.mapearLista(prismaEvento.categorias as string[]);
 
             for(let categoria of categorias){
                 evento.adicionarCategoria(categoria);
@@ -59,7 +63,7 @@ class HidratarEventoMapper extends ObjectMapper<PrismaEventoEntity, Evento> {
         // Se tivermos imagens vindas do banco de dados, adicionamos
         // no objeto de modelo...
         if(prismaEvento.imagens){
-            const imagensEvento = this._imagemEventoMapper.mapearListaOrigemParaListaDestino(prismaEvento.imagens as PrismaImagemEventoEntity[]);
+            const imagensEvento = this._imagemEventoMapper.mapearLista(prismaEvento.imagens as PrismaImagemEventoEntity[]);
 
             for(let imagemEvento of imagensEvento){
                 imagemEvento.adicionarEvento(evento);
@@ -70,15 +74,27 @@ class HidratarEventoMapper extends ObjectMapper<PrismaEventoEntity, Evento> {
         // Se tivermos dados do organizador vindas do banco de dados,
         // adicionamos no objeto de modelo...
         if(prismaEvento.organizador){
-            const organizador = this._organizadorMapper.mapearOrigemParaDestino(prismaEvento.organizador as PrismaOrganizadorEntity);
+            const organizador = this._organizadorMapper.mapear(prismaEvento.organizador as PrismaOrganizadorEntity);
             evento.adicionarOrganizador(organizador);
         }
 
         return evento;
     }
 
-    private formatarDataPadraoISO(data: Date): string {
-        return data.toISOString().split("T")[0];
+    private formatarData(data: Date): string {
+        return (
+            DateTime
+                .fromJSDate(data, { zone: "utc" })
+                .toFormat("yyyy-LL-dd")
+        );
+    }
+
+    private formatarHora(dataHora: Date): string {
+        return (
+            DateTime
+                .fromJSDate(dataHora, { zone: "America/Manaus" })
+                .toFormat("TT")
+        );
     }
 }
 

@@ -8,7 +8,7 @@ class LocalidadeEventoDTOMapper extends ObjectMapper<LocalidadeVO, LocalidadeEve
         super();
     }
 
-    public mapearOrigemParaDestino(localidade: LocalidadeVO): LocalidadeEventoDTO {
+    public mapear(localidade: LocalidadeVO): LocalidadeEventoDTO {
         return {
             cidade: localidade.cidade,
             uf: localidade.uf

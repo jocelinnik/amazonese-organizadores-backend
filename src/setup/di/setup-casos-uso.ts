@@ -1,5 +1,7 @@
 import { ObjectMapper } from "@/aplicacao/abstracoes/mapper/base.mapper";
+import { SalvarContatoUsuario } from "@/aplicacao/comum/casos-uso/salvar-contato-usuario.usecase";
 import { ManipuladorArquivos } from "@/aplicacao/comum/providers/manipulador-arquivos";
+import { ContatosUsuariosRepository } from "@/aplicacao/comum/repositorios/contatos-usuarios.repository";
 import { AdicionarImagemEvento } from "@/aplicacao/evento/casos-uso/adicionar-imagem-evento.usecase";
 import { BuscarEventoPorId } from "@/aplicacao/evento/casos-uso/buscar-evento-por-id.usecase";
 import { BuscarEventosPorOrganizador } from "@/aplicacao/evento/casos-uso/buscar-eventos-por-organizador.usecase";
@@ -12,6 +14,7 @@ import { RedefinirSenhaOrganizador } from "@/aplicacao/organizador/casos-uso/red
 import { CifradorSegredos } from "@/aplicacao/organizador/providers/cifrador-segredos";
 import { GerenciadorTokenAutenticacao } from "@/aplicacao/organizador/providers/gerenciador-tokens-autenticacao";
 import { IdentificadorFactory } from "@/dominio/abstracoes/identificadores/identificador.factory";
+import { ContatoUsuarioId } from "@/dominio/comum/identificadores/contato-usuario.identificador";
 import { Evento } from "@/dominio/evento/agregados/evento.aggregate";
 import { EventoId } from "@/dominio/evento/identificadores/evento.identificador";
 import { ImagemEventoId } from "@/dominio/evento/identificadores/imagem-evento.identificador";
@@ -26,6 +29,12 @@ const configurarObjetosCasosUso = (): void => {
 
     // Configurando as instâncias de objetos de caso
     // de uso da aplicação...
+    container.set("SalvarContatoUsuario", (cont: ContainerDI): SalvarContatoUsuario => {
+        const repository = cont.get<ContatosUsuariosRepository>("ContatosUsuariosRepository");
+        const contatoIdFactory = cont.get<IdentificadorFactory<ContatoUsuarioId>>("ContatoUsuarioIdFactory");
+
+        return new SalvarContatoUsuario({ contatoIdFactory, repository });
+    });
     container.set("CadastrarNovoOrganizador", (cont: ContainerDI): CadastrarNovoOrganizador => {
         const repository = cont.get<OrganizadoresRepository>("OrganizadoresRepository");
         const cifradorSenha = cont.get<CifradorSegredos>("CifradorSenhas");
@@ -52,12 +61,14 @@ const configurarObjetosCasosUso = (): void => {
         const organizadoresRepository = cont.get<OrganizadoresRepository>("OrganizadoresRepository");
         const eventoIdFactory = cont.get<IdentificadorFactory<EventoId>>("EventoIdFactory");
         const categoriaEventoMapper = cont.get<ObjectMapper<string, CategoriaVO>>("CategoriaVOMapper");
+        const eventoDTOMapper = cont.get<ObjectMapper<Evento, EventoDTO>>("EventoDTOMapper");
 
         return new CadastrarNovoEvento({
             categoriaEventoMapper,
             eventoIdFactory,
             eventosRepository,
-            organizadoresRepository
+            organizadoresRepository,
+            eventoDTOMapper
         });
     });
     container.set("BuscarEventosPorOrganizador", (cont: ContainerDI): BuscarEventosPorOrganizador => {

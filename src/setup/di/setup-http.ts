@@ -1,3 +1,4 @@
+import { SalvarContatoUsuario } from "@/aplicacao/comum/casos-uso/salvar-contato-usuario.usecase";
 import { AdicionarImagemEvento } from "@/aplicacao/evento/casos-uso/adicionar-imagem-evento.usecase";
 import { BuscarEventoPorId } from "@/aplicacao/evento/casos-uso/buscar-evento-por-id.usecase";
 import { BuscarEventosPorOrganizador } from "@/aplicacao/evento/casos-uso/buscar-eventos-por-organizador.usecase";
@@ -8,6 +9,8 @@ import { RealizarLoginOrganizador } from "@/aplicacao/organizador/casos-uso/real
 import { RedefinirSenhaOrganizador } from "@/aplicacao/organizador/casos-uso/redefinir-senha-organizador.usecase";
 import { GerenciadorTokenAutenticacao } from "@/aplicacao/organizador/providers/gerenciador-tokens-autenticacao";
 import { ContainerDI } from "@/infraestrutura/comum/di/container-di";
+import { HomeController } from "@/infraestrutura/comum/express/controllers/home.controller";
+import { SalvarContatoUsuarioController } from "@/infraestrutura/comum/express/controllers/salvar-contato-usuario.controller";
 import { FormatadorArquivos } from "@/infraestrutura/comum/express/middlewares/formatador-arquivos.middleware";
 import { VerificadorTokenJWT } from "@/infraestrutura/comum/express/middlewares/verificador-token-jwt.middleware";
 import { AdicionarImagemEventoController } from "@/infraestrutura/evento/express/controllers/adicionar-imagem-evento.controller";
@@ -35,6 +38,14 @@ const configurarObjetosHTTP = (): void => {
 
     // Configurando as instâncias de objetos controllers
     // HTTP da aplicação...
+    container.set("HomeController", (): HomeController => {
+        return new HomeController();
+    });
+    container.set("SalvarContatoUsuarioController", (cont: ContainerDI): SalvarContatoUsuarioController => {
+        const useCase = cont.get<SalvarContatoUsuario>("SalvarContatoUsuario");
+
+        return new SalvarContatoUsuarioController({ useCase });
+    });
     container.set("CadastrarNovoOrganizadorController", (cont: ContainerDI): CadastrarNovoOrganizadorController => {
         const useCase = cont.get<CadastrarNovoOrganizador>("CadastrarNovoOrganizador");
 

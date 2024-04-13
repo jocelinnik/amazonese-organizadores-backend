@@ -36,16 +36,16 @@ class EventoDTOMapper extends ObjectMapper<Evento, EventoDTO> {
         this._localidadeDTOMapper = params.localidadeDTOMapper;
     }
 
-    public mapearOrigemParaDestino(evento: Evento): EventoDTO {
+    public mapear(evento: Evento): EventoDTO {
         return {
             id: evento.id.valor,
             nome: evento.nome.valor,
             descricao: evento.descricao.valor,
             preco: evento.preco.valor,
-            categorias: this._categoriaDTOMapper.mapearListaOrigemParaListaDestino(evento.categorias),
-            imagens: this._imagemEventoMapper.mapearListaOrigemParaListaDestino(evento.imagens),
-            localidade: this._localidadeDTOMapper.mapearOrigemParaDestino(evento.localidade),
-            datas_evento: this._datasEventoDTOMapper.mapearOrigemParaDestino(evento.datasEvento)
+            categorias: this._categoriaDTOMapper.mapearLista(evento.categorias),
+            imagens: this._imagemEventoMapper.mapearLista(evento.imagens),
+            localidade: this._localidadeDTOMapper.mapear(evento.localidade),
+            datas_evento: this._datasEventoDTOMapper.mapear(evento.datasEvento)
         };
     }
 }

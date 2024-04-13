@@ -1,7 +1,7 @@
 import { BaseVO } from "@/dominio/abstracoes/value-objects/base.vo";
 import { ValidacaoRejeitadaException } from "@/dominio/comum/excecoes/validadores/validador.exception";
 import { ValidadorString } from "@/dominio/comum/validadores/string.validador";
-import { TelefoneVOInvalidoException } from "@/dominio/organizador/excecoes/value-objects/telefone.exception";
+import { TelefoneVOInvalidoException } from "@/dominio/comum/excecoes/value-objects/telefone.exception";
 
 class TelefoneVO implements BaseVO {
 

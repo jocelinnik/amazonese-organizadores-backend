@@ -7,7 +7,7 @@ class CategoriaDTOMapper extends ObjectMapper<CategoriaVO, string> {
         super();
     }
 
-    public mapearOrigemParaDestino(categoria: CategoriaVO): string {
+    public mapear(categoria: CategoriaVO): string {
         return categoria.valor;
     }
 }

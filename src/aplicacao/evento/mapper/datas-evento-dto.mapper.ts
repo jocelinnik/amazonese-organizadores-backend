@@ -8,15 +8,13 @@ class DatasEventoDTOMapper extends ObjectMapper<DatasEventoVO, DatasEventoDTO> {
         super();
     }
 
-    public mapearOrigemParaDestino(datas: DatasEventoVO): DatasEventoDTO {
+    public mapear(datas: DatasEventoVO): DatasEventoDTO {
         return {
-            data_inicio: this.formatarDataPadraoISO(datas.dataInicio),
-            data_fim: this.formatarDataPadraoISO(datas.dataFim)
+            data_inicio: datas.dataInicio,
+            data_fim: datas.dataFim,
+            hora_inicio: datas.horaInicio,
+            hora_encerramento: datas.horaEncerramento
         };
-    }
-
-    private formatarDataPadraoISO(data: Date): string {
-        return data.toISOString().split("T")[0];
     }
 }
 

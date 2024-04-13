@@ -12,6 +12,8 @@ import { PrismaEventosRepository } from "@/infraestrutura/evento/prisma/reposito
 import { PrismaImagensEventosRepository } from "@/infraestrutura/evento/prisma/repositorios/prisma-imagens-eventos.repository";
 import { PrismaOrganizadorEntity } from "@/infraestrutura/organizador/prisma/entidades/prisma-organizador.entity";
 import { PrismaOrganizadoresRepository } from "@/infraestrutura/organizador/prisma/repositorios/prisma-organizadores.repository";
+import { ContatosUsuariosRepository } from "@/aplicacao/comum/repositorios/contatos-usuarios.repository";
+import { PrismaContatosUsuariosRepository } from "@/infraestrutura/comum/prisma/repositorios/prisma-contatos-usuarios.repository";
 
 const configurarObjetosBD = (): void => {
     const container = ContainerDI.pegarInstancia();
@@ -26,6 +28,11 @@ const configurarObjetosBD = (): void => {
 
     // Configurando instâncias de repositório de dados
     // da aplicação...
+    container.set("ContatosUsuariosRepository", (cont: ContainerDI): ContatosUsuariosRepository => {
+        const conexao = cont.get<PrismaClient>("PrismaClient");
+
+        return new PrismaContatosUsuariosRepository({ conexao });
+    });
     container.set("EventosRepository", (cont: ContainerDI): EventosRepository => {
         const conexao = cont.get<PrismaClient>("PrismaClient");
         const eventoMapper = cont.get<ObjectMapper<PrismaEventoEntity, Evento>>("HidratarEventoMapper");

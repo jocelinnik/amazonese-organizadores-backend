@@ -1,10 +1,10 @@
 abstract class ObjectMapper<K, V> {
 
-    public mapearListaOrigemParaListaDestino(origemList: Array<K>): Array<V> {
-        return origemList.map(origem => this.mapearOrigemParaDestino(origem));
+    public mapearLista(origemList: Array<K>): Array<V> {
+        return origemList.map(origem => this.mapear(origem));
     }
 
-    public abstract mapearOrigemParaDestino(origem: K): V;
+    public abstract mapear(origem: K): V;
 
 }
 

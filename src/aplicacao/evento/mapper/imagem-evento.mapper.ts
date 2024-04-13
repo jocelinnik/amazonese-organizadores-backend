@@ -7,7 +7,7 @@ class ImagemEventoMapper extends ObjectMapper<ImagemEvento, string> {
         super();
     }
 
-    public mapearOrigemParaDestino(imagem: ImagemEvento): string {
+    public mapear(imagem: ImagemEvento): string {
         return imagem.urlImagem.valor;
     }
 }

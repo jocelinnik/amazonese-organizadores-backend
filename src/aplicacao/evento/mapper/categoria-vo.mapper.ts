@@ -7,7 +7,7 @@ class CategoriaVOMapper extends ObjectMapper<string, CategoriaVO> {
         super();
     }
 
-    public mapearOrigemParaDestino(categoria: string): CategoriaVO {
+    public mapear(categoria: string): CategoriaVO {
         return CategoriaVO.instanciar(categoria);
     }
 }

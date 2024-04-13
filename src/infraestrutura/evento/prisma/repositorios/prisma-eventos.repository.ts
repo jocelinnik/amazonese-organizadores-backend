@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { DateTime } from "luxon";
 
 import { ObjectMapper } from "@/aplicacao/abstracoes/mapper/base.mapper";
 import { Evento } from "@/dominio/evento/agregados/evento.aggregate";
@@ -38,7 +39,7 @@ class PrismaEventosRepository implements EventosRepository {
         if(!dadosEvento)
             throw new EventoNaoEncontradoException(`O evento com ID ${id.valor} não foi encontrado`);
 
-        return this._eventoMapper.mapearOrigemParaDestino(dadosEvento);
+        return this._eventoMapper.mapear(dadosEvento);
     }
 
     public async buscarEventosPorOrganizador(organizador: Organizador): Promise<Array<Evento>> {
@@ -52,7 +53,7 @@ class PrismaEventosRepository implements EventosRepository {
             }
         });
 
-        return this._eventoMapper.mapearListaOrigemParaListaDestino(dadosEventos);
+        return this._eventoMapper.mapearLista(dadosEventos);
     }
 
     public async salvar(evento: Evento): Promise<void> {
@@ -64,8 +65,10 @@ class PrismaEventosRepository implements EventosRepository {
                 preco: evento.preco.valor,
                 cidadeEvento: evento.localidade.cidade,
                 ufEvento: evento.localidade.uf,
-                dataInicio: evento.datasEvento.dataInicio,
-                dataFim: evento.datasEvento.dataFim,
+                dataInicio: this.formatarData(evento.datasEvento.dataInicio),
+                dataFim: this.formatarData(evento.datasEvento.dataFim),
+                horaInicio: this.formatarHora(evento.datasEvento.horaInicio),
+                horaEncerramento: this.formatarHora(evento.datasEvento.horaEncerramento),
                 cpfCnpjOrganizador: evento.organizador.cpfOuCnpj.valor,
                 categorias: [...evento.categorias.map(cat => cat.valor)]
             },
@@ -75,14 +78,40 @@ class PrismaEventosRepository implements EventosRepository {
                 preco: evento.preco.valor,
                 cidadeEvento: evento.localidade.cidade,
                 ufEvento: evento.localidade.uf,
-                dataInicio: evento.datasEvento.dataInicio,
-                dataFim: evento.datasEvento.dataFim,
+                dataInicio: this.formatarData(evento.datasEvento.dataInicio),
+                dataFim: this.formatarData(evento.datasEvento.dataFim),
+                horaInicio: this.formatarHora(evento.datasEvento.horaInicio),
+                horaEncerramento: this.formatarHora(evento.datasEvento.horaEncerramento),
                 categorias: [...evento.categorias.map(cat => cat.valor)]
             },
             where: {
                 id: evento.id.valor
             }
         });
+    }
+
+    private formatarData(strData: string): Date {
+        return (
+            DateTime
+                .fromFormat(
+                    strData, 
+                    "yyyy-LL-dd", 
+                    { zone: "America/Manaus" }
+                )
+                .toJSDate()
+        );
+    }
+
+    private formatarHora(strHora: string): Date {
+        return (
+            DateTime
+                .fromFormat(
+                    strHora, 
+                    "HH:mm:ss",
+                    { zone: "America/Manaus" }
+                )
+                .toJSDate()
+        );
     }
 }
 

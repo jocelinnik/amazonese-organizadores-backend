@@ -32,7 +32,7 @@ class PrismaOrganizadoresRepository implements OrganizadoresRepository {
         if(!dadosOrganizador)
             throw new Error(`O organizador com CPF/CNPJ ${cpfOUcnpj.valor} não foi encontrado`);
 
-        return this._organizadorMapper.mapearOrigemParaDestino(dadosOrganizador);
+        return this._organizadorMapper.mapear(dadosOrganizador);
     }
 
     public async salvar(organizador: Organizador): Promise<void> {
