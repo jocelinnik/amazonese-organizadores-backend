@@ -8,6 +8,7 @@ import { CadastrarNovoOrganizador } from "@/aplicacao/organizador/casos-uso/cada
 import { RealizarLoginOrganizador } from "@/aplicacao/organizador/casos-uso/realizar-login-organizador.usecase";
 import { RedefinirSenhaOrganizador } from "@/aplicacao/organizador/casos-uso/redefinir-senha-organizador.usecase";
 import { GerenciadorTokenAutenticacao } from "@/aplicacao/organizador/providers/gerenciador-tokens-autenticacao";
+import { OrganizadoresRepository } from "@/dominio/organizador/repositorios/organizadores.repository";
 import { ContainerDI } from "@/infraestrutura/comum/di/container-di";
 import { HomeController } from "@/infraestrutura/comum/express/controllers/home.controller";
 import { SalvarContatoUsuarioController } from "@/infraestrutura/comum/express/controllers/salvar-contato-usuario.controller";
@@ -29,8 +30,9 @@ const configurarObjetosHTTP = (): void => {
     // HTTP da aplicação...
     container.set("VerificadorTokenJWT", (cont: ContainerDI): VerificadorTokenJWT => {
         const gerenciadorTokens = cont.get<GerenciadorTokenAutenticacao>("GerenciadorTokenAutenticacao");
+        const organizadoresRepository = cont.get<OrganizadoresRepository>("OrganizadoresRepository");
 
-        return new VerificadorTokenJWT({ gerenciadorTokens });
+        return new VerificadorTokenJWT({ gerenciadorTokens, organizadoresRepository });
     });
     container.set("FormatadorArquivos", (): FormatadorArquivos => {
         return new FormatadorArquivos();

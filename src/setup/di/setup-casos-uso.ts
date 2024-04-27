@@ -1,6 +1,9 @@
+import { configDotenv } from "dotenv";
+
 import { ObjectMapper } from "@/aplicacao/abstracoes/mapper/base.mapper";
 import { SalvarContatoUsuario } from "@/aplicacao/comum/casos-uso/salvar-contato-usuario.usecase";
 import { ManipuladorArquivos } from "@/aplicacao/comum/providers/manipulador-arquivos";
+import { ProdutorMensageria } from "@/aplicacao/comum/providers/produtor-mensageria";
 import { ContatosUsuariosRepository } from "@/aplicacao/comum/repositorios/contatos-usuarios.repository";
 import { AdicionarImagemEvento } from "@/aplicacao/evento/casos-uso/adicionar-imagem-evento.usecase";
 import { BuscarEventoPorId } from "@/aplicacao/evento/casos-uso/buscar-evento-por-id.usecase";
@@ -25,6 +28,7 @@ import { OrganizadoresRepository } from "@/dominio/organizador/repositorios/orga
 import { ContainerDI } from "@/infraestrutura/comum/di/container-di";
 
 const configurarObjetosCasosUso = (): void => {
+    configDotenv();
     const container = ContainerDI.pegarInstancia();
 
     // Configurando as instâncias de objetos de caso
@@ -57,26 +61,27 @@ const configurarObjetosCasosUso = (): void => {
         return new RedefinirSenhaOrganizador({ cifradorSenha, cifradorFraseSecreta, repository });
     });
     container.set("CadastrarNovoEvento", (cont: ContainerDI): CadastrarNovoEvento => {
+        const filaNotificarNovoEvento = process.env.ASB_FILA_NOTIFICAR_NOVO_EVENTO as string;
         const eventosRepository = cont.get<EventosRepository>("EventosRepository");
-        const organizadoresRepository = cont.get<OrganizadoresRepository>("OrganizadoresRepository");
         const eventoIdFactory = cont.get<IdentificadorFactory<EventoId>>("EventoIdFactory");
         const categoriaEventoMapper = cont.get<ObjectMapper<string, CategoriaVO>>("CategoriaVOMapper");
         const eventoDTOMapper = cont.get<ObjectMapper<Evento, EventoDTO>>("EventoDTOMapper");
+        const produtorMensageria = cont.get<ProdutorMensageria>("ProdutorMensageria");
 
         return new CadastrarNovoEvento({
             categoriaEventoMapper,
             eventoIdFactory,
             eventosRepository,
-            organizadoresRepository,
-            eventoDTOMapper
+            eventoDTOMapper,
+            produtorMensageria,
+            filaNotificarNovoEvento
         });
     });
     container.set("BuscarEventosPorOrganizador", (cont: ContainerDI): BuscarEventosPorOrganizador => {
-        const eventosRepository = cont.get<EventosRepository>("EventosRepository");
-        const organizadoresRepository = cont.get<OrganizadoresRepository>("OrganizadoresRepository");
-        const eventoDTOMapper = cont.get<ObjectMapper<Evento, EventoDTO>>("EventoDTOMapper");
+        const repository = cont.get<EventosRepository>("EventosRepository");
+        const mapper = cont.get<ObjectMapper<Evento, EventoDTO>>("EventoDTOMapper");
 
-        return new BuscarEventosPorOrganizador({ eventosRepository, organizadoresRepository, eventoDTOMapper });
+        return new BuscarEventosPorOrganizador({ repository: repository, mapper: mapper });
     });
     container.set("BuscarEventoPorId", (cont: ContainerDI): BuscarEventoPorId => {
         const repository = cont.get<EventosRepository>("EventosRepository");

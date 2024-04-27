@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { Mensagem } from "@/aplicacao/comum/dto/mensagem.dto";
 import { CadastrarNovoEvento } from "@/aplicacao/evento/casos-uso/cadastrar-novo-evento.usecase";
 import { NovoEventoDTO } from "@/aplicacao/evento/dto/evento.dto";
+import { Organizador } from "@/dominio/organizador/modelos/organizador.model";
 
 type CadastrarNovoEventoControllerParams = {
     useCase: CadastrarNovoEvento;
@@ -18,8 +19,9 @@ class CadastrarNovoEventoController {
 
     public async executar(req: Request, res: Response): Promise<void> {
         try{
+            const organizador = req["organizador"] as Organizador;
             const dadosNovoEvento = req.body as NovoEventoDTO;
-            const novoEvento = await this._useCase.executar(dadosNovoEvento);
+            const novoEvento = await this._useCase.executar({ dadosNovoEvento, organizador });
 
             res.status(201).json(novoEvento);
         }catch(e: any){

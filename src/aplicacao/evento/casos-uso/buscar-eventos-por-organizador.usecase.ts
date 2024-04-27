@@ -3,36 +3,33 @@ import { EventoDTO } from "@/aplicacao/evento/dto/evento.dto";
 import { BaseModelException } from "@/dominio/abstracoes/excecoes/model.exception";
 import { Evento } from "@/dominio/evento/agregados/evento.aggregate";
 import { EventosRepository } from "@/dominio/evento/repositorios/eventos.repository";
-import { CpfCnpjOrganizador } from "@/dominio/organizador/identificadores/organizador.identificador";
-import { OrganizadoresRepository } from "@/dominio/organizador/repositorios/organizadores.repository";
+import { Organizador } from "@/dominio/organizador/modelos/organizador.model";
 
 type BuscarEventosPorOrganizadorParams = {
-    eventosRepository: EventosRepository;
-    organizadoresRepository: OrganizadoresRepository;
-    eventoDTOMapper: ObjectMapper<Evento, EventoDTO>;
+    repository: EventosRepository;
+    mapper: ObjectMapper<Evento, EventoDTO>;
+};
+type BuscarEventosPorOrganizadorInput = {
+    organizador: Organizador;
 };
 
 class BuscarEventosPorOrganizador {
 
-    private readonly _eventosRepository: EventosRepository;
+    private readonly _repository: EventosRepository;
 
-    private readonly _organizadoresRepository: OrganizadoresRepository;
-
-    private readonly _eventoDTOMapper: ObjectMapper<Evento, EventoDTO>;
+    private readonly _mapper: ObjectMapper<Evento, EventoDTO>;
 
     public constructor(params: BuscarEventosPorOrganizadorParams){
-        this._eventosRepository = params.eventosRepository;
-        this._organizadoresRepository = params.organizadoresRepository;
-        this._eventoDTOMapper = params.eventoDTOMapper;
+        this._repository = params.repository;
+        this._mapper = params.mapper;
     }
 
-    public async executar(input: string): Promise<Array<EventoDTO>> {
+    public async executar(input: BuscarEventosPorOrganizadorInput): Promise<Array<EventoDTO>> {
         try{
-            const cpfOuCnpjOrganizador = CpfCnpjOrganizador.instanciar(input);
-            const organizador = await this._organizadoresRepository.buscarPorCpfCnpj(cpfOuCnpjOrganizador);
-            const eventos = await this._eventosRepository.buscarEventosPorOrganizador(organizador);
+            const { organizador } = input;
+            const eventos = await this._repository.buscarEventosPorOrganizador(organizador);
 
-            return this._eventoDTOMapper.mapearLista(eventos);
+            return this._mapper.mapearLista(eventos);
         }catch(e: any){
             console.error(e);
             const erro = e as BaseModelException;

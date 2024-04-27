@@ -1,4 +1,5 @@
 import { ObjectMapper } from "@/aplicacao/abstracoes/mapper/base.mapper";
+import { ProdutorMensageria } from "@/aplicacao/comum/providers/produtor-mensageria";
 import { DadosEventoDTO, NovoEventoDTO } from "@/aplicacao/evento/dto/evento.dto";
 import { BaseModelException } from "@/dominio/abstracoes/excecoes/model.exception";
 import { IdentificadorFactory } from "@/dominio/abstracoes/identificadores/identificador.factory";
@@ -6,15 +7,19 @@ import { Evento } from "@/dominio/evento/agregados/evento.aggregate";
 import { EventoId } from "@/dominio/evento/identificadores/evento.identificador";
 import { EventosRepository } from "@/dominio/evento/repositorios/eventos.repository";
 import { CategoriaVO } from "@/dominio/evento/value-objects/categoria.vo";
-import { CpfCnpjOrganizador } from "@/dominio/organizador/identificadores/organizador.identificador";
-import { OrganizadoresRepository } from "@/dominio/organizador/repositorios/organizadores.repository";
+import { Organizador } from "@/dominio/organizador/modelos/organizador.model";
 
 type CadastrarNovoEventoParams = {
     categoriaEventoMapper: ObjectMapper<string, CategoriaVO>;
     eventoIdFactory: IdentificadorFactory<EventoId>;
     eventosRepository: EventosRepository;
-    organizadoresRepository: OrganizadoresRepository;
     eventoDTOMapper: ObjectMapper<Evento, DadosEventoDTO>;
+    produtorMensageria: ProdutorMensageria;
+    filaNotificarNovoEvento: string;
+};
+type CadastrarNovoEventoInput = {
+    dadosNovoEvento: NovoEventoDTO;
+    organizador: Organizador;
 };
 
 class CadastrarNovoEvento {
@@ -25,25 +30,31 @@ class CadastrarNovoEvento {
 
     private readonly _eventosRepository: EventosRepository;
 
-    private readonly _organizadoresRepository: OrganizadoresRepository;
-
     private readonly _eventoDTOMapper: ObjectMapper<Evento, DadosEventoDTO>;
+
+    private readonly _produtorMensageria: ProdutorMensageria;
+
+    private readonly _filaNotificarNovoEvento: string;
 
     public constructor(params: CadastrarNovoEventoParams){
         this._categoriaEventoMapper = params.categoriaEventoMapper;
         this._eventoIdFactory = params.eventoIdFactory;
         this._eventosRepository = params.eventosRepository;
-        this._organizadoresRepository = params.organizadoresRepository;
         this._eventoDTOMapper = params.eventoDTOMapper;
+        this._produtorMensageria = params.produtorMensageria;
+        this._filaNotificarNovoEvento = params.filaNotificarNovoEvento;
     }
 
-    public async executar(input: NovoEventoDTO): Promise<DadosEventoDTO> {
+    public async executar(input: CadastrarNovoEventoInput): Promise<DadosEventoDTO> {
         try{
-            const cpfOuCnpjOrganizador = CpfCnpjOrganizador.instanciar(input.cpf_cnpj_organizador);
-            const organizador = await this._organizadoresRepository.buscarPorCpfCnpj(cpfOuCnpjOrganizador);
-            const novoEvento = await this.instanciarEvento(input);
+            const { dadosNovoEvento, organizador } = input;
+            const novoEvento = await this.instanciarEvento(dadosNovoEvento);
             novoEvento.adicionarOrganizador(organizador);
             await this._eventosRepository.salvar(novoEvento);
+            await this._produtorMensageria.publicarMensagem(
+                this._filaNotificarNovoEvento, 
+                novoEvento.id.valor
+            );
 
             return this._eventoDTOMapper.mapear(novoEvento);
         }catch(e: any){

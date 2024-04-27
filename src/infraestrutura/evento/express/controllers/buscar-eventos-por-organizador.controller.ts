@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import { BuscarEventosPorOrganizador } from "@/aplicacao/evento/casos-uso/buscar-eventos-por-organizador.usecase";
+import { Organizador } from "@/dominio/organizador/modelos/organizador.model";
 
 type BuscarEventosPorOrganizadorControllerParams = {
     useCase: BuscarEventosPorOrganizador;
@@ -16,8 +17,8 @@ class BuscarEventosPorOrganizadorController {
 
     public async executar(req: Request, res: Response): Promise<void> {
         try{
-            const { cpf_cnpj_organizador } = req.params;
-            const eventos = await this._useCase.executar(cpf_cnpj_organizador);
+            const organizador = req["organizador"] as Organizador;
+            const eventos = await this._useCase.executar({ organizador });
     
             res.status(200).json(eventos);
         }catch(e: any){
