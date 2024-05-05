@@ -9,61 +9,68 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout no repositorio
-        uses: actions/checkout@v3
+    - name: Checkout no repositorio
+      uses: actions/checkout@v3
 
-      - name: Copiando o arquivo .env
-        run: |
-          cp .env.example .env
+    - name: Copiando o arquivo .env
+      run: |
+        cp .env.example .env
 
-      - name: Substituindo variaveis de ambiente
-        uses: franzbischoff/replace_envs@v1
-        env:
-          NODE_ENV: ${{ vars.NODE_ENV }}
-          HTTP_PORTA: ${{ vars.HTTP_PORTA }}
-          CIFRADOR_SENHAS_ALGORITMO: ${{ vars.CIFRADOR_SENHAS_ALGORITMO }}
-          CIFRADOR_SENHAS_SEGREDO: ${{ vars.CIFRADOR_SENHAS_SEGREDO }}
-          CIFRADOR_SENHAS_ITERACOES: ${{ vars.CIFRADOR_SENHAS_ITERACOES }}
-          CIFRADOR_FRASES_SECRETAS_ALGORITMO: ${{ vars.CIFRADOR_FRASES_SECRETAS_ALGORITMO }}
-          CIFRADOR_FRASES_SECRETAS_SEGREDO: ${{ vars.CIFRADOR_FRASES_SECRETAS_SEGREDO }}
-          CIFRADOR_FRASES_SECRETAS_ITERACOES: ${{ vars.CIFRADOR_FRASES_SECRETAS_ITERACOES }}
-          JWT_CHAVE: ${{ vars.JWT_CHAVE }}
-          JWT_SUB: ${{ vars.JWT_SUB }}
-          JWT_EXPIRACAO_EM_MINUTOS: ${{ vars.JWT_EXPIRACAO_EM_MINUTOS }}
-          JWT_REFRESH_EXPIRACAO_EM_HORAS: ${{ vars.JWT_REFRESH_EXPIRACAO_EM_HORAS }}
-          MYSQL_BANCODEDADOS: ${{ vars.MYSQL_BANCODEDADOS }}
-          MYSQL_ENDERECO: ${{ vars.MYSQL_ENDERECO }}
-          MYSQL_PORTA: ${{ vars.MYSQL_PORTA }}
-          MYSQL_SENHA: ${{ vars.MYSQL_SENHA }}
-          MYSQL_USUARIO: ${{ vars.MYSQL_USUARIO }}
-          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
-          AZURE_BLOB_STORAGE_BASEURL: ${{ vars.AZURE_BLOB_STORAGE_BASEURL }}
-          AZURE_CONTAINER_IMAGENS_EVENTOS: ${{ vars.AZURE_CONTAINER_IMAGENS_EVENTOS }}
-          AZURE_SERVICEBUS_CONEXAO: ${{ vars.AZURE_SERVICEBUS_CONEXAO }}
-          ASB_FILA_NOTIFICAR_NOVO_EVENTO: ${{ vars.ASB_FILA_NOTIFICAR_NOVO_EVENTO }}
+    - name: Substituindo variaveis de ambiente
+      uses: franzbischoff/replace_envs@v1
+      env:
+        NODE_ENV: ${{ vars.NODE_ENV }}
+        HTTP_PORTA: ${{ vars.HTTP_PORTA }}
+        CIFRADOR_SENHAS_ALGORITMO: ${{ vars.CIFRADOR_SENHAS_ALGORITMO }}
+        CIFRADOR_SENHAS_SEGREDO: ${{ vars.CIFRADOR_SENHAS_SEGREDO }}
+        CIFRADOR_SENHAS_ITERACOES: ${{ vars.CIFRADOR_SENHAS_ITERACOES }}
+        CIFRADOR_FRASES_SECRETAS_ALGORITMO: ${{ vars.CIFRADOR_FRASES_SECRETAS_ALGORITMO }}
+        CIFRADOR_FRASES_SECRETAS_SEGREDO: ${{ vars.CIFRADOR_FRASES_SECRETAS_SEGREDO }}
+        CIFRADOR_FRASES_SECRETAS_ITERACOES: ${{ vars.CIFRADOR_FRASES_SECRETAS_ITERACOES }}
+        JWT_CHAVE: ${{ vars.JWT_CHAVE }}
+        JWT_SUB: ${{ vars.JWT_SUB }}
+        JWT_EXPIRACAO_EM_MINUTOS: ${{ vars.JWT_EXPIRACAO_EM_MINUTOS }}
+        JWT_REFRESH_EXPIRACAO_EM_HORAS: ${{ vars.JWT_REFRESH_EXPIRACAO_EM_HORAS }}
+        MYSQL_BANCODEDADOS: ${{ vars.MYSQL_BANCODEDADOS }}
+        MYSQL_ENDERECO: ${{ vars.MYSQL_ENDERECO }}
+        MYSQL_PORTA: ${{ vars.MYSQL_PORTA }}
+        MYSQL_SENHA: ${{ vars.MYSQL_SENHA }}
+        MYSQL_USUARIO: ${{ vars.MYSQL_USUARIO }}
+        AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+        AZURE_BLOB_STORAGE_BASEURL: ${{ vars.AZURE_BLOB_STORAGE_BASEURL }}
+        AZURE_CONTAINER_IMAGENS_EVENTOS: ${{ vars.AZURE_CONTAINER_IMAGENS_EVENTOS }}
+        AZURE_SERVICEBUS_CONEXAO: ${{ vars.AZURE_SERVICEBUS_CONEXAO }}
+        ASB_FILA_NOTIFICAR_NOVO_EVENTO: ${{ vars.ASB_FILA_NOTIFICAR_NOVO_EVENTO }}
+      with:
+        from_file: '.env'
+        to_file: '.env'
+        commit: 'false'
+
+    - name: Configurando o Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '18.16.0'
+
+    - name: Instalando dependencias e gerando a aplicacao
+      run: |
+        npm ci
+        npm i -g tsc-alias
+        npm run build
+
+    - name: Autenticacao no Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ vars.AZURECR_ENDERECO }}
+        username: ${{ vars.AZURECR_USUARIO }}
+        password: ${{ vars.AZURECR_SENHA }}
+
+    - name: Autenticacao no Docker Hub
+        uses: docker/login-action@v3
         with:
-          from_file: '.env'
-          to_file: '.env'
-          commit: 'false'
+          username: ${{ vars.DOCKER_HUB_USUARIO }}
+          password: ${{ vars.DOCKER_HUB_SENHA }}
 
-      - name: Configurando o Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: '18.16.0'
-
-      - name: Instalando dependencias e gerando a aplicacao
-        run: |
-          npm ci
-          npm i -g tsc-alias
-          npm run build
-
-      # - name: Autenticacao no Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ vars.DOCKER_HUB_USUARIO }}
-      #     password: ${{ vars.DOCKER_HUB_SENHA }}
-
-      # - name: Gerando a imagem e subindo para o Docker Hub
-      #   run: |
-      #     docker build -t ${{ vars.DOCKER_HUB_USUARIO }}/amazonese-organizadores-backend:latest --build-arg HTTP_PORTA=${{ vars.HTTP_PORTA }} .
-      #     docker push ${{ vars.DOCKER_HUB_USUARIO }}/amazonese-organizadores-backend:latest
+    - name: Gerando a imagem e subindo para o Docker Hub
+      run: |
+        docker build -t ${{ vars.DOCKER_HUB_USUARIO }}/amazonese-organizadores-backend:latest --build-arg HTTP_PORTA=${{ vars.HTTP_PORTA }} .
+        docker push ${{ vars.DOCKER_HUB_USUARIO }}/amazonese-organizadores-backend:latest
