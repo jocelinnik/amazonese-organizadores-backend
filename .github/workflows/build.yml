@@ -65,10 +65,10 @@ jobs:
         password: ${{ vars.AZURECR_SENHA }}
 
     - name: Autenticacao no Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKER_HUB_USUARIO }}
-          password: ${{ vars.DOCKER_HUB_SENHA }}
+      uses: docker/login-action@v3
+      with:
+        username: ${{ vars.DOCKER_HUB_USUARIO }}
+        password: ${{ vars.DOCKER_HUB_SENHA }}
 
     - name: Gerando a imagem e subindo para o Docker Hub
       run: |
